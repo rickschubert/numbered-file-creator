@@ -27,8 +27,11 @@ fn main() {
     let scenes_directory = Path::new(&dir_as_ref_with_point_at_start);
     dbg!(scenes_directory);
     let paths = fs::read_dir(scenes_directory).unwrap();
-    for path in paths {
-        println!("Name: {}", path.unwrap().path().display())
-    }
+    // TODO: The below filter will work, just need to line it up
+    // paths.filter(|x| x.unwrap().file_name());
+    // for path in paths {
+    //     let filename = path.unwrap().file_name();
+    //     dbg!(filename);
+    // }
 
 }
