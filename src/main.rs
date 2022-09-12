@@ -5,6 +5,12 @@ use std::process::exit;
 use std::path::Path;
 use std::fs::{self, DirEntry};
 
+fn get_leading_number_from_file(file_name: &str) -> &str {
+    let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
+    let number = number_only_regex.captures(file_name).unwrap().get(1).unwrap().as_str();
+    return number;
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -19,9 +25,8 @@ fn main() {
 
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
-    let file_stem = path.file_name().unwrap().to_str().unwrap();
-    let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
-    let number = number_only_regex.captures(file_stem).unwrap().get(1).unwrap().as_str();
+    let file_name = path.file_name().unwrap().to_str().unwrap();
+    let number = get_leading_number_from_file(file_name);
     dbg!(number);
 
 
