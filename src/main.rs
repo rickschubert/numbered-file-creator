@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::env;
+use regex::Regex;
 use std::process::exit;
 use std::path::Path;
 use std::fs::{self, DirEntry};
@@ -18,6 +19,10 @@ fn main() {
 
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
+    let file_stem = path.file_stem().unwrap().to_str().unwrap();
+    let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
+    let number = number_only_regex.captures(file_stem).unwrap().get(1).unwrap().as_str();
+    dbg!(number);
 
 
     let dir_as_ref = directory.to_str().expect("there was no string");
