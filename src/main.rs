@@ -19,7 +19,7 @@ fn main() {
 
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
-    let file_stem = path.file_stem().unwrap().to_str().unwrap();
+    let file_stem = path.file_name().unwrap().to_str().unwrap();
     let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
     let number = number_only_regex.captures(file_stem).unwrap().get(1).unwrap().as_str();
     dbg!(number);
