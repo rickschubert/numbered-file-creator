@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::env;
 use std::process::exit;
+use regex::Regex;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -13,4 +14,7 @@ fn main() {
     dbg!(new_scene_path);
     let file = File::create(new_scene_path).expect("Error encountered while creating file!");
     dbg!(file);
+
+    let re = Regex::new(r"(?:.*\\).+\.fountain$").unwrap();
+    println!("{}", new_scene_path.replace("re", ""));
 }
