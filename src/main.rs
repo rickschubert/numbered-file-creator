@@ -20,7 +20,14 @@ fn main() {
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
 
-    for entry in fs::read_dir(directory) {
+
+    let dir_as_ref = directory.to_str().expect("there was no string");
+    // let current_dir = env::current_dir().unwrap();
+
+    let dir_as_ref_with_point_at_start = format!("./{dir_as_ref}");
+    let scenes_directory = Path::new(&dir_as_ref_with_point_at_start);
+    dbg!(scenes_directory);
+    for entry in fs::read_dir(scenes_directory) {
         dbg!(entry);
     }
 
