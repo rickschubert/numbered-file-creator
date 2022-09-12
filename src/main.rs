@@ -1,3 +1,4 @@
+use std::fs::File;
 use std::env;
 use std::process::exit;
 
@@ -9,6 +10,7 @@ fn main() {
     }
 
     let ref new_scene_path = args[1];
-    // dbg!(args);
     dbg!(new_scene_path);
+    let file = File::create(new_scene_path).expect("Error encountered while creating file!");
+    dbg!(file);
 }
