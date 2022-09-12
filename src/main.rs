@@ -2,6 +2,8 @@ use std::fs::File;
 use std::env;
 use std::process::exit;
 use std::path::Path;
+use std::fs::{self, DirEntry};
+
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -17,5 +19,9 @@ fn main() {
 
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
+
+    for entry in fs::read_dir(directory) {
+        dbg!(entry);
+    }
 
 }
