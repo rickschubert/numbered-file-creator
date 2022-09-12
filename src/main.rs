@@ -4,7 +4,6 @@ use std::process::exit;
 use std::path::Path;
 use std::fs::{self, DirEntry};
 
-
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -27,8 +26,9 @@ fn main() {
     let dir_as_ref_with_point_at_start = format!("./{dir_as_ref}");
     let scenes_directory = Path::new(&dir_as_ref_with_point_at_start);
     dbg!(scenes_directory);
-    for entry in fs::read_dir(scenes_directory) {
-        dbg!(entry);
+    let paths = fs::read_dir(scenes_directory).unwrap();
+    for path in paths {
+        println!("Name: {}", path.unwrap().path().display())
     }
 
 }
