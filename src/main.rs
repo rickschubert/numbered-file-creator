@@ -50,11 +50,8 @@ fn main() {
                         let n = dir_entry.file_name();
                         let leading_number_from_file =
                             get_leading_number_from_file(n.to_str().unwrap());
-                        println!("{}", leading_number_from_file);
                         let leading_number_as_int: &i32 =
                             &leading_number_from_file.parse().unwrap();
-                        dbg!(leading_number_from_file.eq(number));
-                        dbg!(leading_number_as_int < &number.parse::<i32>().unwrap());
                         return leading_number_from_file.eq(number)
                             || leading_number_as_int > &number.parse::<i32>().unwrap();
                     }
