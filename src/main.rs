@@ -46,20 +46,24 @@ fn main() {
             let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
                 .filter(|x| match x {
                     Err(_) => false,
-                    Ok(dirEntry) => {
-                        let n = dirEntry.file_name();
-                        let leading_number_from_file = get_leading_number_from_file(n.to_str().unwrap());
+                    Ok(dir_entry) => {
+                        let n = dir_entry.file_name();
+                        let leading_number_from_file =
+                            get_leading_number_from_file(n.to_str().unwrap());
                         println!("{}", leading_number_from_file);
-                        // return true;
-                        let leading_number_as_int: &i32 = &leading_number_from_file.parse().unwrap();
+                        let leading_number_as_int: &i32 =
+                            &leading_number_from_file.parse().unwrap();
                         dbg!(leading_number_from_file.eq(number));
                         dbg!(leading_number_as_int < &number.parse::<i32>().unwrap());
-                        return leading_number_from_file.eq(number) || leading_number_as_int > &number.parse::<i32>().unwrap();
+                        return leading_number_from_file.eq(number)
+                            || leading_number_as_int > &number.parse::<i32>().unwrap();
                     }
                 })
                 .into_iter()
                 .collect();
             dbg!(items_that_need_renaming);
+
+            // For each item that needs renaming, increase the number indicator
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
