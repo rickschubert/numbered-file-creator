@@ -39,22 +39,25 @@ fn main() {
     let dir_as_ref_with_point_at_start = format!("./{dir_as_ref}");
     let scenes_directory = Path::new(&dir_as_ref_with_point_at_start);
     dbg!(scenes_directory);
-    let mut paths = fs::read_dir(scenes_directory);
+    let paths = fs::read_dir(scenes_directory);
 
     match paths {
         Ok(inner) => {
-            let filtered: Vec<Result<DirEntry, std::io::Error>> = inner
+            let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
                 .filter(|x| match x {
                     Err(_) => false,
                     Ok(dirEntry) => {
-                        return get_leading_number_from_file(
-                            dirEntry.file_name().to_str().unwrap(),
-                        ) != "04";
+                        let n = dirEntry.file_name();
+                        let leading_number_from_file = get_leading_number_from_file(n.to_str().unwrap());
+                        println!("{}", leading_number_from_file);
+                        // return true;
+                        let leading_number_as_int: &i32 = &leading_number_from_file.parse().unwrap();
+                        return leading_number_from_file != number && leading_number_as_int >= &number.parse::<i32>().unwrap();
                     }
                 })
                 .into_iter()
                 .collect();
-            dbg!(filtered);
+            dbg!(items_that_need_renaming);
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
