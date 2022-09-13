@@ -1,15 +1,20 @@
-use std::fs::{File, ReadDir};
-use std::env;
-use regex::Regex;
-use std::process::exit;
-use std::path::Path;
-use std::fs::{self, DirEntry};
 use filters::filter::Filter;
+use regex::Regex;
+use std::env;
+use std::fs::{self, DirEntry};
+use std::fs::{File, ReadDir};
+use std::path::Path;
+use std::process::exit;
 
 fn get_leading_number_from_file(file_name: &str) -> &str {
     // TODO: It would be nice if this wouldn't have to be calculated every time
     let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
-    let number = number_only_regex.captures(file_name).unwrap().get(1).unwrap().as_str();
+    let number = number_only_regex
+        .captures(file_name)
+        .unwrap()
+        .get(1)
+        .unwrap()
+        .as_str();
     return number;
 }
 
@@ -22,8 +27,6 @@ fn main() {
 
     let ref new_scene_path = args[1];
     dbg!(new_scene_path);
-    // let file = File::create(new_scene_path).expect("Error encountered while creating file!");
-    // dbg!(file);
 
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
@@ -31,9 +34,7 @@ fn main() {
     let number = get_leading_number_from_file(file_name);
     dbg!(number);
 
-
     let dir_as_ref = directory.to_str().expect("there was no string");
-    // let current_dir = env::current_dir().unwrap();
 
     let dir_as_ref_with_point_at_start = format!("./{dir_as_ref}");
     let scenes_directory = Path::new(&dir_as_ref_with_point_at_start);
@@ -42,35 +43,19 @@ fn main() {
 
     match paths {
         Ok(inner) => {
-            let filtered: Vec<Result<DirEntry, std::io::Error>> = inner.filter(|x| {
-                match x {
+            let filtered: Vec<Result<DirEntry, std::io::Error>> = inner
+                .filter(|x| match x {
                     Err(_) => false,
                     Ok(dirEntry) => {
-                        return get_leading_number_from_file(dirEntry.file_name().to_str().unwrap()) != "04";
+                        return get_leading_number_from_file(
+                            dirEntry.file_name().to_str().unwrap(),
+                        ) != "04";
                     }
-                }
-                // get_leading_number_from_file(x.as_ref().unwrap().file_name().to_str().unwrap()) != "04";
-            }).into_iter().collect();
+                })
+                .into_iter()
+                .collect();
             dbg!(filtered);
-            // let filtered : Vec<DirEntry> = paths_inner.filter(|x| inrange.filter(&x.unwrap())).collect();
-        },
-        Err(error) => panic!("Problem reading the directory: {:?}", error)
+        }
+        Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
-
-    // let inrange  = (|&a: &fs::DirEntry| { get_leading_number_from_file(a.file_name().to_str().unwrap()) != "04" });
-    // let filtered : Vec<DirEntry> = paths_inner.filter(|x| inrange.filter(&x.unwrap())).collect();
-
-
-    // TODO: The below filter will work, just need to line it up
-    // paths.filter(|x| get_leading_number_from_file(x.as_ref().unwrap().file_name().to_str().unwrap()) != "04");
-    //     for path in paths {
-    //     let filename = path.unwrap().file_name();
-    //     dbg!(filename);
-    // }
-    // dbg!(paths);
-    // for path in paths {
-    //     let filename = path.unwrap().file_name();
-    //     dbg!(filename);
-    // }
-
 }
