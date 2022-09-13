@@ -52,7 +52,7 @@ fn main() {
                         println!("{}", leading_number_from_file);
                         // return true;
                         let leading_number_as_int: &i32 = &leading_number_from_file.parse().unwrap();
-                        return leading_number_from_file != number && leading_number_as_int >= &number.parse::<i32>().unwrap();
+                        return leading_number_from_file.ne(number) && leading_number_as_int >= &number.parse::<i32>().unwrap();
                     }
                 })
                 .into_iter()
