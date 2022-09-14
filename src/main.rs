@@ -81,13 +81,13 @@ fn main() {
                     new_lead.push('0');
                 }
                 let new_number_as_int = lead_as_int + 1;
-                new_lead = format!("{new_lead}{new_number_as_int}");
+                new_lead = format!("{new_lead}{new_number_as_int}_");
                 println!("This is the new lead {}", new_lead);
-                // new_number_as_int.toch
-                // new_lead.push(new_number_as_int);
-                // If the lead is below 9, construct a special one
 
-                // If the lead is 9 or above, add number
+                // Construct the new file name
+                let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
+                let new_file_name = number_only_regex.replace(&filename, new_lead);
+                println!("That's the new file name {}", new_file_name);
             });
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
