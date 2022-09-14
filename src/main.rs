@@ -46,16 +46,16 @@ fn leading_number_from_file(file_name: &str) -> &str {
 
 fn content_paths(items: Vec<Result<DirEntry, std::io::Error>>) -> Vec<String> {
     let mut names = Vec::new();
-
     let mut paths = Vec::new();
-    items.into_iter().for_each(|x| {
-        let p = x.unwrap().path();
-        paths.push(p);
-    });
 
-    paths.iter().for_each(|x| {
-        names.push(x.to_str().unwrap().to_owned());
-    });
+    for item in items {
+        let p = item.unwrap().path();
+        paths.push(p);
+    }
+    for path in paths {
+        names.push(path.to_str().unwrap().to_owned());
+    }
+    
     return names;
 }
 
@@ -109,10 +109,10 @@ fn rename_necessary_files_and_create_new_one(
     new_scene_path: &str,
 ) {
     let items_to_be_renamed = filter_content_for_files_to_rename(content, lead_of_new_file);
-    items_to_be_renamed.into_iter().for_each(|path| {
+    for path in items_to_be_renamed {
         let new_file_name = updated_file_name(&path);
         rename_file(&path, &new_file_name);
-    });
+    }
     create_new_file(new_scene_path);
 }
 
