@@ -81,6 +81,18 @@ fn get_directory_content(directory: &Path) -> Result<ReadDir, std::io::Error> {
     return paths;
 }
 
+fn rename_necessary_files_and_create_new_one(content: ReadDir, lead_of_new_file: &str, new_scene_path: &str) {
+    let items_to_be_renamed = filter_for_files_to_be_renamed(content, lead_of_new_file);
+
+    // For each item that needs renaming, increase the number indicator
+    items_to_be_renamed.into_iter().for_each(|path| {
+        let new_file_name = get_new_file_name_for_moved_file(&path);
+        rename_file(&path, &new_file_name);
+    });
+
+    create_new_file(new_scene_path);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -94,21 +106,10 @@ fn main() {
     let directory = path.parent().unwrap();
     let file_name = path.file_name().unwrap().to_str().unwrap();
     let lead_of_new_file = get_leading_number_from_file(file_name);
+    let content = get_directory_content(directory);
 
-    let paths = get_directory_content(directory);
-
-    match paths {
-        Ok(content) => {
-            let items_to_be_renamed = filter_for_files_to_be_renamed(content, &lead_of_new_file);
-
-            // For each item that needs renaming, increase the number indicator
-            items_to_be_renamed.into_iter().for_each(|path| {
-                let new_file_name = get_new_file_name_for_moved_file(&path);
-                rename_file(&path, &new_file_name);
-            });
-
-            create_new_file(&new_scene_path);
-        }
+    match content {
+        Ok(content) => rename_necessary_files_and_create_new_one(content, lead_of_new_file, new_scene_path),
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
 }
