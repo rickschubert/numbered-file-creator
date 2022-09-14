@@ -63,6 +63,15 @@ fn filter_for_files_to_be_renamed(content: ReadDir, number: &str) -> Vec<String>
     return names;
 }
 
+fn get_new_file_name_for_moved_file(path: &str) -> String {
+    let lead = get_leading_number_from_file(&path);
+    let lead_as_int: &i32 = &lead.parse().unwrap();
+
+    let new_lead = generate_new_lead(lead_as_int);
+    let new_file_name = get_new_file_name(&path, &new_lead);
+    return new_file_name;
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -88,12 +97,7 @@ fn main() {
 
             // For each item that needs renaming, increase the number indicator
             items_to_be_renamed.into_iter().for_each(|path| {
-                let lead = get_leading_number_from_file(&path);
-                let lead_as_int: &i32 = &lead.parse().unwrap();
-
-                let new_lead = generate_new_lead(lead_as_int);
-                let new_file_name = get_new_file_name(&path, &new_lead);
-
+                let new_file_name = get_new_file_name_for_moved_file(&path);
                 rename_file(&path, &new_file_name);
             });
 
