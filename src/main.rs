@@ -5,11 +5,12 @@ use std::ffi::OsString;
 use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
 use std::path::Path;
+use std::io::Error;
 use std::process::exit;
 
 fn get_leading_number_from_file(file_name: &str) -> &str {
     // TODO: It would be nice if this wouldn't have to be calculated every time
-    let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
+    let number_only_regex = Regex::new(r"/?(\d+)_").unwrap();
     let number = number_only_regex
         .captures(file_name)
         .unwrap()
@@ -19,7 +20,7 @@ fn get_leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
+fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<Result<DirEntry, Error>> {
     let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
         .filter(|x| match x {
             Err(_) => false,
@@ -34,15 +35,17 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
         .into_iter()
         .collect();
     dbg!(&items_that_need_renaming);
+    return items_that_need_renaming;
 
-    return items_that_need_renaming
-        .into_iter()
-        .map(|x| {
-            let n = x.unwrap().file_name().into_string().unwrap();
-            return n;
-        })
-        .collect();
+//     return items_that_need_renaming
+//         .into_iter()
+//         .map(|x| {
+//             let n = x.unwrap().file_name().into_string().unwrap();
+//             return n;
+//         })
+//         .collect();
 }
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -73,7 +76,9 @@ fn main() {
 
             // For each item that needs renaming, increase the number indicator
             items_to_be_renamed.into_iter().for_each(|filename| {
-                let lead = get_leading_number_from_file(&filename);
+                let n = filename.unwrap().path();
+                let filenamestring = n.to_str().unwrap();
+                let lead = get_leading_number_from_file(&filenamestring);
                 let lead_as_int: &i32 = &lead.parse().unwrap();
 
                 let mut new_lead = String::new();
@@ -81,12 +86,12 @@ fn main() {
                     new_lead.push('0');
                 }
                 let new_number_as_int = lead_as_int + 1;
-                new_lead = format!("{new_lead}{new_number_as_int}_");
+                new_lead = format!("/{new_lead}{new_number_as_int}_");
                 println!("This is the new lead {}", new_lead);
 
                 // Construct the new file name
-                let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
-                let new_file_name = number_only_regex.replace(&filename, new_lead);
+                let number_only_regex = Regex::new(r"/(\d+)_").unwrap();
+                let new_file_name = number_only_regex.replace(&filenamestring, new_lead);
                 println!("That's the new file name {}", new_file_name);
             });
         }
