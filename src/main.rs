@@ -44,18 +44,18 @@ fn leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn content_paths(items: Vec<Result<DirEntry, std::io::Error>>) -> Vec<String> {
+fn content_paths(items: Vec<DirEntry>) -> Vec<String> {
     let mut names = Vec::new();
     let mut paths = Vec::new();
 
     for item in items {
-        let p = item.unwrap().path();
+        let p = item.path();
         paths.push(p);
     }
     for path in paths {
         names.push(path.to_str().unwrap().to_owned());
     }
-    
+
     return names;
 }
 
@@ -74,11 +74,12 @@ fn filter_dir_entries_for_files_to_rename(dir_entry: &DirEntry, number: &str) ->
 }
 
 fn filter_content_for_files_to_rename(content: ReadDir, number: &str) -> Vec<String> {
-    let to_be_renamed: Vec<Result<DirEntry, std::io::Error>> = content
-        .filter(|x| match x {
-            Err(_) => false,
-            Ok(dir_entry) => filter_dir_entries_for_files_to_rename(dir_entry, number),
-        })
+    let mut to_be_renamed: Vec<DirEntry> = content.into_iter()
+    .filter_map(|s| Some(s.unwrap()))
+    .collect();
+
+    to_be_renamed = to_be_renamed.into_iter().filter(|x|
+        filter_dir_entries_for_files_to_rename(x, number),)
         .into_iter()
         .collect();
 
