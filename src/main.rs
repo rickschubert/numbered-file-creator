@@ -72,6 +72,14 @@ fn get_new_file_name_for_moved_file(path: &str) -> String {
     return new_file_name;
 }
 
+fn get_directory_content(directory: &Path) -> Result<ReadDir, std::io::Error> {
+    let dir = directory.to_str().expect("there was no string");
+    let dir_relative = format!("./{dir}");
+    let scenes_directory = Path::new(&dir_relative);
+    let paths = fs::read_dir(scenes_directory);
+    return paths;
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
@@ -86,10 +94,7 @@ fn main() {
     let file_name = path.file_name().unwrap().to_str().unwrap();
     let lead_of_new_file = get_leading_number_from_file(file_name);
 
-    let dir = directory.to_str().expect("there was no string");
-    let dir_relative = format!("./{dir}");
-    let scenes_directory = Path::new(&dir_relative);
-    let paths = fs::read_dir(scenes_directory);
+    let paths = get_directory_content(directory);
 
     match paths {
         Ok(content) => {
