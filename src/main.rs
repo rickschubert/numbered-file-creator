@@ -1,6 +1,6 @@
 use filters::filter::Filter;
 use regex::Regex;
-use std::env;
+use std::{env, result};
 use std::ffi::OsString;
 use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
@@ -75,10 +75,10 @@ fn main() {
             dbg!(&items_to_be_renamed);
 
             // For each item that needs renaming, increase the number indicator
-            items_to_be_renamed.into_iter().for_each(|filename| {
-                let n = filename.unwrap().path();
-                let filenamestring = n.to_str().unwrap();
-                let lead = get_leading_number_from_file(&filenamestring);
+            items_to_be_renamed.into_iter().for_each(|path| {
+                let n = path.unwrap().path();
+                let pathstring = n.to_str().unwrap();
+                let lead = get_leading_number_from_file(&pathstring);
                 let lead_as_int: &i32 = &lead.parse().unwrap();
 
                 let mut new_lead = String::new();
@@ -91,8 +91,15 @@ fn main() {
 
                 // Construct the new file name
                 let number_only_regex = Regex::new(r"/(\d+)_").unwrap();
-                let new_file_name = number_only_regex.replace(&filenamestring, new_lead);
-                println!("That's the new file name {}", new_file_name);
+                let new_file_name = number_only_regex.replace(&pathstring, new_lead).to_string();
+                println!("That's the new file name {}", &new_file_name);
+
+                // Rename file
+                let result_of_renaming = fs::rename(&pathstring, &new_file_name);
+                match result_of_renaming {
+                    Ok(_) => println!("It worked! Renamed from from {} to {}", &pathstring, new_file_name),
+                    Err(error) => panic!("Unable to rename file: {}", error),
+                }
             });
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
