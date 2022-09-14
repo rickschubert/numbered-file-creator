@@ -1,12 +1,10 @@
-use filters::filter::Filter;
 use regex::Regex;
-use std::ffi::OsString;
 use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
 use std::io::Error;
 use std::path::Path;
 use std::process::exit;
-use std::{env, result};
+use std::{env};
 
 fn get_leading_number_from_file(file_name: &str) -> &str {
     // TODO: It would be nice if this wouldn't have to be calculated every time
@@ -36,14 +34,6 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<Result<Di
         .collect();
     dbg!(&items_that_need_renaming);
     return items_that_need_renaming;
-
-    //     return items_that_need_renaming
-    //         .into_iter()
-    //         .map(|x| {
-    //             let n = x.unwrap().file_name().into_string().unwrap();
-    //             return n;
-    //         })
-    //         .collect();
 }
 
 fn main() {
