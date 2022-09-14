@@ -61,7 +61,7 @@ fn get_paths_from_contents(
     return names;
 }
 
-fn filter_dir_entries_for_files_to_be_renamed(dir_entry: &DirEntry, number: &str) -> bool {
+fn filter_dir_entries_for_files_to_rename(dir_entry: &DirEntry, number: &str) -> bool {
     let n = dir_entry.file_name();
 
     let captured = NUMBLER_ONLY_REGEX_IN_FILE_NAME.captures(&n.to_str().unwrap());
@@ -75,11 +75,11 @@ fn filter_dir_entries_for_files_to_be_renamed(dir_entry: &DirEntry, number: &str
     return lead.eq(number) || lead_i > &number.parse::<i32>().unwrap();
 }
 
-fn filter_for_files_to_be_renamed(content: ReadDir, number: &str) -> Vec<String> {
+fn filter_content_for_files_to_rename(content: ReadDir, number: &str) -> Vec<String> {
     let to_be_renamed: Vec<Result<DirEntry, std::io::Error>> = content
         .filter(|x| match x {
             Err(_) => false,
-            Ok(dir_entry) => filter_dir_entries_for_files_to_be_renamed(dir_entry, number),
+            Ok(dir_entry) => filter_dir_entries_for_files_to_rename(dir_entry, number),
         })
         .into_iter()
         .collect();
@@ -111,7 +111,7 @@ fn rename_necessary_files_and_create_new_one(
     lead_of_new_file: &str,
     new_scene_path: &str,
 ) {
-    let items_to_be_renamed = filter_for_files_to_be_renamed(content, lead_of_new_file);
+    let items_to_be_renamed = filter_content_for_files_to_rename(content, lead_of_new_file);
 
     // For each item that needs renaming, increase the number indicator
     items_to_be_renamed.into_iter().for_each(|path| {
