@@ -38,23 +38,25 @@ fn get_paths_from_contents(
     return names;
 }
 
+fn filter_dir_entries_for_files_to_be_renamed(dir_entry: &DirEntry, number: &str) -> bool {
+    let n = dir_entry.file_name();
+
+    let captured = NUMBLER_ONLY_REGEX_IN_FILE_NAME.captures(&n.to_str().unwrap());
+    match captured {
+        Some(_) => (),
+        None => return false,
+    }
+
+    let lead = get_leading_number_from_file(n.to_str().unwrap());
+    let lead_i: &i32 = &lead.parse().unwrap();
+    return lead.eq(number) || lead_i > &number.parse::<i32>().unwrap();
+}
+
 fn filter_for_files_to_be_renamed(content: ReadDir, number: &str) -> Vec<String> {
     let to_be_renamed: Vec<Result<DirEntry, std::io::Error>> = content
         .filter(|x| match x {
             Err(_) => false,
-            Ok(dir_entry) => {
-                let n = dir_entry.file_name();
-
-                let captured = NUMBLER_ONLY_REGEX_IN_FILE_NAME.captures(&n.to_str().unwrap());
-                match captured {
-                    Some(_) => (),
-                    None => return false,
-                }
-
-                let lead = get_leading_number_from_file(n.to_str().unwrap());
-                let lead_i: &i32 = &lead.parse().unwrap();
-                return lead.eq(number) || lead_i > &number.parse::<i32>().unwrap();
-            }
+            Ok(dir_entry) => filter_dir_entries_for_files_to_be_renamed(dir_entry, number)
         })
         .into_iter()
         .collect();
