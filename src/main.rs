@@ -11,6 +11,29 @@ lazy_static! {
     static ref NUMBLER_ONLY_REGEX_IN_FILE_NAME: Regex = Regex::new(r"^(\d+)_").unwrap();
 }
 
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        println!("Error: You neeed to provide at least one argument, a dynamic path to the new scene file that should be created!");
+        exit(0);
+    }
+
+    let ref new_scene_path = args[1];
+
+    let path = Path::new(new_scene_path);
+    let directory = path.parent().unwrap();
+    let file_name = path.file_name().unwrap().to_str().unwrap();
+    let lead_of_new_file = get_leading_number_from_file(file_name);
+    let content = get_directory_content(directory);
+
+    match content {
+        Ok(content) => {
+            rename_necessary_files_and_create_new_one(content, lead_of_new_file, new_scene_path)
+        }
+        Err(error) => panic!("Problem reading the directory: {:?}", error),
+    }
+}
+
 fn get_leading_number_from_file(file_name: &str) -> &str {
     let number = NUMBER_ONLY_REGEX_IN_PATH
         .captures(file_name)
@@ -56,7 +79,7 @@ fn filter_for_files_to_be_renamed(content: ReadDir, number: &str) -> Vec<String>
     let to_be_renamed: Vec<Result<DirEntry, std::io::Error>> = content
         .filter(|x| match x {
             Err(_) => false,
-            Ok(dir_entry) => filter_dir_entries_for_files_to_be_renamed(dir_entry, number)
+            Ok(dir_entry) => filter_dir_entries_for_files_to_be_renamed(dir_entry, number),
         })
         .into_iter()
         .collect();
@@ -83,7 +106,11 @@ fn get_directory_content(directory: &Path) -> Result<ReadDir, std::io::Error> {
     return paths;
 }
 
-fn rename_necessary_files_and_create_new_one(content: ReadDir, lead_of_new_file: &str, new_scene_path: &str) {
+fn rename_necessary_files_and_create_new_one(
+    content: ReadDir,
+    lead_of_new_file: &str,
+    new_scene_path: &str,
+) {
     let items_to_be_renamed = filter_for_files_to_be_renamed(content, lead_of_new_file);
 
     // For each item that needs renaming, increase the number indicator
@@ -93,27 +120,6 @@ fn rename_necessary_files_and_create_new_one(content: ReadDir, lead_of_new_file:
     });
 
     create_new_file(new_scene_path);
-}
-
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
-        println!("Error: You neeed to provide at least one argument, a dynamic path to the new scene file that should be created!");
-        exit(0);
-    }
-
-    let ref new_scene_path = args[1];
-
-    let path = Path::new(new_scene_path);
-    let directory = path.parent().unwrap();
-    let file_name = path.file_name().unwrap().to_str().unwrap();
-    let lead_of_new_file = get_leading_number_from_file(file_name);
-    let content = get_directory_content(directory);
-
-    match content {
-        Ok(content) => rename_necessary_files_and_create_new_one(content, lead_of_new_file, new_scene_path),
-        Err(error) => panic!("Problem reading the directory: {:?}", error),
-    }
 }
 
 fn get_new_file_name(pathstring: &str, new_lead: &str) -> String {
