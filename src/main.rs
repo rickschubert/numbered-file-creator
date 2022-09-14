@@ -84,15 +84,8 @@ fn main() {
                 let new_file_name = number_only_regex.replace(&pathstring, new_lead).to_string();
                 println!("That's the new file name {}", &new_file_name);
 
-                // Rename file
                 rename_file(&pathstring, &new_file_name);
-
-                // Create new file with the desired file name
-                let file_creation_result = File::create(&new_scene_path);
-                match file_creation_result {
-                    Ok(_) => println!("It worked! Created new file{}", &new_scene_path),
-                    Err(error) => panic!("Unable to create new file: {}", error),
-                }
+                create_new_file(&new_scene_path);
             });
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
@@ -107,5 +100,13 @@ fn rename_file(pathstring: &str, new_file_name: &str) {
             pathstring, new_file_name
         ),
         Err(error) => panic!("Unable to rename file: {}", error),
+    }
+}
+
+fn create_new_file(new_scene_path: &str) {
+    let file_creation_result = File::create(new_scene_path);
+    match file_creation_result {
+        Ok(_) => println!("It worked! Created new file{}", new_scene_path),
+        Err(error) => panic!("Unable to create new file: {}", error),
     }
 }
