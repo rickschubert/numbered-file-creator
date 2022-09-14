@@ -1,12 +1,12 @@
 use filters::filter::Filter;
 use regex::Regex;
-use std::{env, result};
 use std::ffi::OsString;
 use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
-use std::path::Path;
 use std::io::Error;
+use std::path::Path;
 use std::process::exit;
+use std::{env, result};
 
 fn get_leading_number_from_file(file_name: &str) -> &str {
     // TODO: It would be nice if this wouldn't have to be calculated every time
@@ -37,13 +37,13 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<Result<Di
     dbg!(&items_that_need_renaming);
     return items_that_need_renaming;
 
-//     return items_that_need_renaming
-//         .into_iter()
-//         .map(|x| {
-//             let n = x.unwrap().file_name().into_string().unwrap();
-//             return n;
-//         })
-//         .collect();
+    //     return items_that_need_renaming
+    //         .into_iter()
+    //         .map(|x| {
+    //             let n = x.unwrap().file_name().into_string().unwrap();
+    //             return n;
+    //         })
+    //         .collect();
 }
 
 fn main() {
@@ -97,7 +97,10 @@ fn main() {
                 // Rename file
                 let result_of_renaming = fs::rename(&pathstring, &new_file_name);
                 match result_of_renaming {
-                    Ok(_) => println!("It worked! Renamed from from {} to {}", &pathstring, new_file_name),
+                    Ok(_) => println!(
+                        "It worked! Renamed from from {} to {}",
+                        &pathstring, new_file_name
+                    ),
                     Err(error) => panic!("Unable to rename file: {}", error),
                 }
 
