@@ -54,7 +54,7 @@ fn main() {
     }
 
     let ref new_scene_path = args[1];
-    dbg!(new_scene_path);
+    dbg!(&new_scene_path);
 
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
@@ -99,6 +99,13 @@ fn main() {
                 match result_of_renaming {
                     Ok(_) => println!("It worked! Renamed from from {} to {}", &pathstring, new_file_name),
                     Err(error) => panic!("Unable to rename file: {}", error),
+                }
+
+                // Create new file with the desired file name
+                let file_creation_result = File::create(&new_scene_path);
+                match result_of_renaming {
+                    Ok(_) => println!("It worked! Created new file{}", &new_scene_path),
+                    Err(error) => panic!("Unable to create new file: {}", error),
                 }
             });
         }
