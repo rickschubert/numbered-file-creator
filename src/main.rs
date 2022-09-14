@@ -19,7 +19,7 @@ fn get_leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str): Vec<String> {
+fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
     let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
     .filter(|x| match x {
         Err(_) => false,
