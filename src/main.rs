@@ -111,13 +111,10 @@ fn rename_necessary_files_and_create_new_one(
     new_scene_path: &str,
 ) {
     let items_to_be_renamed = filter_content_for_files_to_rename(content, lead_of_new_file);
-
-    // For each item that needs renaming, increase the number indicator
     items_to_be_renamed.into_iter().for_each(|path| {
         let new_file_name = updated_file_name(&path);
         rename_file(&path, &new_file_name);
     });
-
     create_new_file(new_scene_path);
 }
 
