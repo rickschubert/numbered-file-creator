@@ -23,7 +23,7 @@ fn main() {
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
     let file_name = path.file_name().unwrap().to_str().unwrap();
-    let lead_of_new_file = get_leading_number_from_file(file_name);
+    let lead_of_new_file = leading_number_from_file(file_name);
     let content = get_directory_content(directory);
 
     match content {
@@ -34,7 +34,7 @@ fn main() {
     }
 }
 
-fn get_leading_number_from_file(file_name: &str) -> &str {
+fn leading_number_from_file(file_name: &str) -> &str {
     let number = NUMBER_ONLY_REGEX_IN_PATH
         .captures(file_name)
         .unwrap()
@@ -44,7 +44,7 @@ fn get_leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn get_paths_from_contents(
+fn content_paths(
     items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>>,
 ) -> Vec<String> {
     let mut names = Vec::new();
@@ -70,7 +70,7 @@ fn filter_dir_entries_for_files_to_rename(dir_entry: &DirEntry, number: &str) ->
         None => return false,
     }
 
-    let lead = get_leading_number_from_file(n.to_str().unwrap());
+    let lead = leading_number_from_file(n.to_str().unwrap());
     let lead_i: &i32 = &lead.parse().unwrap();
     return lead.eq(number) || lead_i > &number.parse::<i32>().unwrap();
 }
@@ -84,17 +84,16 @@ fn filter_content_for_files_to_rename(content: ReadDir, number: &str) -> Vec<Str
         .into_iter()
         .collect();
 
-    let mut names = get_paths_from_contents(to_be_renamed);
+    let mut names = content_paths(to_be_renamed);
     alphanumeric_sort::sort_str_slice_rev(&mut names);
     return names;
 }
 
-fn get_new_file_name_for_moved_file(path: &str) -> String {
-    let lead = get_leading_number_from_file(&path);
+fn updated_file_name(path: &str) -> String {
+    let lead = leading_number_from_file(&path);
     let lead_as_int: &i32 = &lead.parse().unwrap();
-
-    let new_lead = generate_new_lead(lead_as_int);
-    let new_file_name = get_new_file_name(&path, &new_lead);
+    let new_lead = new_lead(lead_as_int);
+    let new_file_name = new_file_name(&path, &new_lead);
     return new_file_name;
 }
 
@@ -115,20 +114,20 @@ fn rename_necessary_files_and_create_new_one(
 
     // For each item that needs renaming, increase the number indicator
     items_to_be_renamed.into_iter().for_each(|path| {
-        let new_file_name = get_new_file_name_for_moved_file(&path);
+        let new_file_name = updated_file_name(&path);
         rename_file(&path, &new_file_name);
     });
 
     create_new_file(new_scene_path);
 }
 
-fn get_new_file_name(pathstring: &str, new_lead: &str) -> String {
+fn new_file_name(pathstring: &str, new_lead: &str) -> String {
     return NUMBER_ONLY_REGEX_IN_PATH
         .replace(pathstring, new_lead)
         .to_string();
 }
 
-fn generate_new_lead(lead_as_int: &i32) -> String {
+fn new_lead(lead_as_int: &i32) -> String {
     let mut new_lead = String::new();
     if lead_as_int < &9 {
         new_lead.push('0');
