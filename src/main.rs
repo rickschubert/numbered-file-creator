@@ -21,6 +21,21 @@ fn get_leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
+fn get_names_from_dir_entry_results_vector(items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>>) -> Vec<String> {
+    let mut names = Vec::new();
+
+    let mut paths = Vec::new();
+    items_that_need_renaming.into_iter().for_each(|x| {
+        let p = x.unwrap().path();
+        paths.push(p);
+    });
+
+    paths.iter().for_each(|x| {
+        names.push(x.to_str().unwrap().to_owned());
+    });
+    return names;
+}
+
 fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
     let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
         .filter(|x| match x {
@@ -43,18 +58,7 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
         .into_iter()
         .collect();
 
-    let mut names = Vec::new();
-
-    let mut paths = Vec::new();
-    items_that_need_renaming.into_iter().for_each(|x| {
-        let p = x.unwrap().path();
-        paths.push(p);
-    });
-
-    paths.iter().for_each(|x| {
-        names.push(x.to_str().unwrap().to_owned());
-    });
-
+    let mut names = get_names_from_dir_entry_results_vector(items_that_need_renaming);
     alphanumeric_sort::sort_str_slice_rev(&mut names);
     return names;
 }
