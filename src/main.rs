@@ -12,7 +12,6 @@ lazy_static! {
 }
 
 fn get_leading_number_from_file(file_name: &str) -> &str {
-    // TODO: It would be nice if this wouldn't have to be calculated every time
     let number = NUMBER_ONLY_REGEX_IN_PATH
         .captures(file_name)
         .unwrap()
