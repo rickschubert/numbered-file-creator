@@ -37,7 +37,7 @@ fn get_names_from_dir_entry_results_vector(items_that_need_renaming: Vec<Result<
 }
 
 fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
-    let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
+    let to_be_renamed: Vec<Result<DirEntry, std::io::Error>> = inner
         .filter(|x| match x {
             Err(_) => false,
             Ok(dir_entry) => {
@@ -49,16 +49,16 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
                     None => return false,
                 }
 
-                let leading_number_from_file = get_leading_number_from_file(n.to_str().unwrap());
-                let leading_number_as_int: &i32 = &leading_number_from_file.parse().unwrap();
-                return leading_number_from_file.eq(number)
-                    || leading_number_as_int > &number.parse::<i32>().unwrap();
+                let lead = get_leading_number_from_file(n.to_str().unwrap());
+                let lead_i: &i32 = &lead.parse().unwrap();
+                return lead.eq(number)
+                    || lead_i > &number.parse::<i32>().unwrap();
             }
         })
         .into_iter()
         .collect();
 
-    let mut names = get_names_from_dir_entry_results_vector(items_that_need_renaming);
+    let mut names = get_names_from_dir_entry_results_vector(to_be_renamed);
     alphanumeric_sort::sort_str_slice_rev(&mut names);
     return names;
 }
@@ -75,17 +75,16 @@ fn main() {
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
     let file_name = path.file_name().unwrap().to_str().unwrap();
-    let number = get_leading_number_from_file(file_name);
+    let lead_of_new_file = get_leading_number_from_file(file_name);
 
-    let dir_as_ref = directory.to_str().expect("there was no string");
-
-    let dir_as_ref_with_point_at_start = format!("./{dir_as_ref}");
-    let scenes_directory = Path::new(&dir_as_ref_with_point_at_start);
+    let dir = directory.to_str().expect("there was no string");
+    let dir_relative = format!("./{dir}");
+    let scenes_directory = Path::new(&dir_relative);
     let paths = fs::read_dir(scenes_directory);
 
     match paths {
         Ok(inner) => {
-            let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &number);
+            let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &lead_of_new_file);
 
             // For each item that needs renaming, increase the number indicator
             items_to_be_renamed.into_iter().for_each(|path| {
@@ -105,8 +104,7 @@ fn main() {
 }
 
 fn get_new_file_name(pathstring: &str, new_lead: &str) -> String {
-    let new_file_name = NUMBER_ONLY_REGEX_IN_PATH.replace(pathstring, new_lead).to_string();
-    return new_file_name;
+    return NUMBER_ONLY_REGEX_IN_PATH.replace(pathstring, new_lead).to_string();
 }
 
 fn generate_new_lead(lead_as_int: &i32) -> String {
@@ -120,8 +118,8 @@ fn generate_new_lead(lead_as_int: &i32) -> String {
 }
 
 fn rename_file(pathstring: &str, new_file_name: &str) {
-    let result_of_renaming = fs::rename(pathstring, new_file_name);
-    match result_of_renaming {
+    let result = fs::rename(pathstring, new_file_name);
+    match result {
         Ok(_) => println!(
             "Renamed file from from {} to {}",
             pathstring, new_file_name
@@ -131,8 +129,8 @@ fn rename_file(pathstring: &str, new_file_name: &str) {
 }
 
 fn create_new_file(new_scene_path: &str) {
-    let file_creation_result = File::create(new_scene_path);
-    match file_creation_result {
+    let result = File::create(new_scene_path);
+    match result {
         Ok(_) => println!("Created new file {}", new_scene_path),
         Err(error) => panic!("Unable to create new file: {}", error),
     }
