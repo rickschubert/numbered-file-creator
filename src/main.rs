@@ -1,9 +1,7 @@
 use regex::Regex;
 use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
-use std::io::Error;
 use std::path::Path;
-use std::cmp::Ordering;
 use std::process::exit;
 use std::{env};
 
@@ -46,57 +44,16 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
 
     let mut paths = Vec::new();
     items_that_need_renaming.into_iter().for_each(|x| {
-        // x.unwrap().path().to_str().unwrap();
         let p = x.unwrap().path();
         paths.push(p);
-        // let s = p.to_str();
-        // &names.push(s.unwrap());
     });
 
     paths.iter().for_each(|x| {
         names.push(x.to_str().unwrap().to_owned());
     });
 
-    // names_only.collect_into(&names);
-
-
     alphanumeric_sort::sort_str_slice_rev(&mut names);
     return names;
-
-
-    // items_that_need_renaming.sort_by(|a, b| {
-    //     let a_file_name = match a {
-    //         Ok(dir_entry) => {
-    //             let dir = dir_entry.file_name();
-    //             dir.to_str().unwrap();
-    //         },
-    //         Err(_) => {
-    //             String::from("");
-    //         }
-    //     };
-    //     let b_file_name = match b {
-    //         Ok(dir_entry) => {
-    //             let dir = dir_entry.file_name();
-    //             dir.to_str().unwrap();
-    //         },
-    //         Err(_) => {
-    //             String::from("");
-    //         }
-    //     };
-
-    //     // a_file_name.cmp(&b_file_name);
-
-    //     Ordering::Less
-    //     if a_file_name < b_file_name {
-    //         Ordering::Less
-    //     } else if a_file_name == b_file_name {
-    //         Ordering::Equal
-    //     } else {
-    //         Ordering::Greater
-    //     }
-    // });
-
-    // return items_that_need_renaming;
 }
 
 fn main() {
@@ -122,7 +79,6 @@ fn main() {
     match paths {
         Ok(inner) => {
             let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &number);
-            // dbg!(items_to_be_renamed);
 
             // For each item that needs renaming, increase the number indicator
             items_to_be_renamed.into_iter().for_each(|path| {
