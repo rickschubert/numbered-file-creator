@@ -122,22 +122,20 @@ fn main() {
     match paths {
         Ok(inner) => {
             let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &number);
-            dbg!(items_to_be_renamed);
+            // dbg!(items_to_be_renamed);
 
-            // // For each item that needs renaming, increase the number indicator
-            // items_to_be_renamed.into_iter().for_each(|path| {
-            //     let n = path.unwrap().path();
-            //     let pathstring = n.to_str().unwrap();
-            //     let lead = get_leading_number_from_file(&pathstring);
-            //     let lead_as_int: &i32 = &lead.parse().unwrap();
+            // For each item that needs renaming, increase the number indicator
+            items_to_be_renamed.into_iter().for_each(|path| {
+                let lead = get_leading_number_from_file(&path);
+                let lead_as_int: &i32 = &lead.parse().unwrap();
 
-            //     let new_lead = generate_new_lead(lead_as_int);
-            //     let new_file_name = get_new_file_name(pathstring, &new_lead);
+                let new_lead = generate_new_lead(lead_as_int);
+                let new_file_name = get_new_file_name(&path, &new_lead);
 
-            //     rename_file(&pathstring, &new_file_name);
-            // });
+                rename_file(&path, &new_file_name);
+            });
 
-            // create_new_file(&new_scene_path);
+            create_new_file(&new_scene_path);
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
