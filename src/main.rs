@@ -19,7 +19,7 @@ fn get_leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) {
+fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str): Vec<String> {
     let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
     .filter(|x| match x {
         Err(_) => false,
@@ -37,11 +37,10 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) {
     .collect();
     dbg!(&items_that_need_renaming);
 
-    let results: Vec<String> = items_that_need_renaming.into_iter().map(|x| {
+    return items_that_need_renaming.into_iter().map(|x| {
         let n = x.unwrap().file_name().into_string().unwrap();
         return n;
     }).collect();
-    dbg!(results);
 }
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -68,7 +67,8 @@ fn main() {
 
     match paths {
         Ok(inner) => {
-            filter_for_files_to_be_renamed(inner, &number);
+            let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &number);
+            dbg!(items_to_be_renamed);
             // For each item that needs renaming, increase the number indicator
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
