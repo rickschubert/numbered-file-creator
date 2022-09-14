@@ -71,13 +71,7 @@ fn main() {
                 let lead = get_leading_number_from_file(&pathstring);
                 let lead_as_int: &i32 = &lead.parse().unwrap();
 
-                let mut new_lead = String::new();
-                if lead_as_int < &9 {
-                    new_lead.push('0');
-                }
-                let new_number_as_int = lead_as_int + 1;
-                new_lead = format!("/{new_lead}{new_number_as_int}_");
-                println!("This is the new lead {}", new_lead);
+                let new_lead = generate_new_lead(lead_as_int);
 
                 // Construct the new file name
                 let number_only_regex = Regex::new(r"/(\d+)_").unwrap();
@@ -90,6 +84,16 @@ fn main() {
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
+}
+
+fn generate_new_lead(lead_as_int: &i32) -> String {
+    let mut new_lead = String::new();
+    if lead_as_int < &9 {
+        new_lead.push('0');
+    }
+    let new_number_as_int = lead_as_int + 1;
+    new_lead = format!("/{new_lead}{new_number_as_int}_");
+    return new_lead;
 }
 
 fn rename_file(pathstring: &str, new_file_name: &str) {
