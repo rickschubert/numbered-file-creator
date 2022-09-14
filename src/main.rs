@@ -32,7 +32,6 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<Result<Di
         })
         .into_iter()
         .collect();
-    dbg!(&items_that_need_renaming);
     return items_that_need_renaming;
 }
 
@@ -44,25 +43,21 @@ fn main() {
     }
 
     let ref new_scene_path = args[1];
-    dbg!(&new_scene_path);
 
     let path = Path::new(new_scene_path);
     let directory = path.parent().unwrap();
     let file_name = path.file_name().unwrap().to_str().unwrap();
     let number = get_leading_number_from_file(file_name);
-    dbg!(number);
 
     let dir_as_ref = directory.to_str().expect("there was no string");
 
     let dir_as_ref_with_point_at_start = format!("./{dir_as_ref}");
     let scenes_directory = Path::new(&dir_as_ref_with_point_at_start);
-    dbg!(scenes_directory);
     let paths = fs::read_dir(scenes_directory);
 
     match paths {
         Ok(inner) => {
             let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &number);
-            dbg!(&items_to_be_renamed);
 
             // For each item that needs renaming, increase the number indicator
             items_to_be_renamed.into_iter().for_each(|path| {
@@ -75,8 +70,9 @@ fn main() {
                 let new_file_name = get_new_file_name(pathstring, &new_lead);
 
                 rename_file(&pathstring, &new_file_name);
-                create_new_file(&new_scene_path);
             });
+
+            create_new_file(&new_scene_path);
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
@@ -102,7 +98,7 @@ fn rename_file(pathstring: &str, new_file_name: &str) {
     let result_of_renaming = fs::rename(pathstring, new_file_name);
     match result_of_renaming {
         Ok(_) => println!(
-            "It worked! Renamed from from {} to {}",
+            "Renamed file from from {} to {}",
             pathstring, new_file_name
         ),
         Err(error) => panic!("Unable to rename file: {}", error),
@@ -112,7 +108,7 @@ fn rename_file(pathstring: &str, new_file_name: &str) {
 fn create_new_file(new_scene_path: &str) {
     let file_creation_result = File::create(new_scene_path);
     match file_creation_result {
-        Ok(_) => println!("It worked! Created new file{}", new_scene_path),
+        Ok(_) => println!("Created new file {}", new_scene_path),
         Err(error) => panic!("Unable to create new file: {}", error),
     }
 }
