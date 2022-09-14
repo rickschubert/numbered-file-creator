@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 regex = "1.6.0"
 filters = "0.4.0"
+alphanumeric-sort = "1.4.4"

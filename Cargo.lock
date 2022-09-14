@@ -12,6 +12,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "alphanumeric-sort"
+version = "1.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77e9c9abb82613923ec78d7a461595d52491ba7240f3c64c0bbe0e6d98e0fce0"
+
+[[package]]
 name = "filters"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -44,6 +50,7 @@ checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 name = "scene-creator"
 version = "0.1.0"
 dependencies = [
+ "alphanumeric-sort",
  "filters",
  "regex",
 ]

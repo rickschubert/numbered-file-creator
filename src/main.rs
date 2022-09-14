@@ -3,6 +3,7 @@ use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
 use std::io::Error;
 use std::path::Path;
+use std::cmp::Ordering;
 use std::process::exit;
 use std::{env};
 
@@ -18,7 +19,7 @@ fn get_leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<Result<DirEntry, Error>> {
+fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
     let items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>> = inner
         .filter(|x| match x {
             Err(_) => false,
@@ -40,7 +41,62 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<Result<Di
         })
         .into_iter()
         .collect();
-    return items_that_need_renaming;
+
+    let mut names = Vec::new();
+
+    let mut paths = Vec::new();
+    items_that_need_renaming.into_iter().for_each(|x| {
+        // x.unwrap().path().to_str().unwrap();
+        let p = x.unwrap().path();
+        paths.push(p);
+        // let s = p.to_str();
+        // &names.push(s.unwrap());
+    });
+
+    paths.iter().for_each(|x| {
+        names.push(x.to_str().unwrap().to_owned());
+    });
+
+    // names_only.collect_into(&names);
+
+
+    alphanumeric_sort::sort_str_slice_rev(&mut names);
+    return names;
+
+
+    // items_that_need_renaming.sort_by(|a, b| {
+    //     let a_file_name = match a {
+    //         Ok(dir_entry) => {
+    //             let dir = dir_entry.file_name();
+    //             dir.to_str().unwrap();
+    //         },
+    //         Err(_) => {
+    //             String::from("");
+    //         }
+    //     };
+    //     let b_file_name = match b {
+    //         Ok(dir_entry) => {
+    //             let dir = dir_entry.file_name();
+    //             dir.to_str().unwrap();
+    //         },
+    //         Err(_) => {
+    //             String::from("");
+    //         }
+    //     };
+
+    //     // a_file_name.cmp(&b_file_name);
+
+    //     Ordering::Less
+    //     if a_file_name < b_file_name {
+    //         Ordering::Less
+    //     } else if a_file_name == b_file_name {
+    //         Ordering::Equal
+    //     } else {
+    //         Ordering::Greater
+    //     }
+    // });
+
+    // return items_that_need_renaming;
 }
 
 fn main() {
@@ -66,21 +122,22 @@ fn main() {
     match paths {
         Ok(inner) => {
             let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &number);
+            dbg!(items_to_be_renamed);
 
-            // For each item that needs renaming, increase the number indicator
-            items_to_be_renamed.into_iter().for_each(|path| {
-                let n = path.unwrap().path();
-                let pathstring = n.to_str().unwrap();
-                let lead = get_leading_number_from_file(&pathstring);
-                let lead_as_int: &i32 = &lead.parse().unwrap();
+            // // For each item that needs renaming, increase the number indicator
+            // items_to_be_renamed.into_iter().for_each(|path| {
+            //     let n = path.unwrap().path();
+            //     let pathstring = n.to_str().unwrap();
+            //     let lead = get_leading_number_from_file(&pathstring);
+            //     let lead_as_int: &i32 = &lead.parse().unwrap();
 
-                let new_lead = generate_new_lead(lead_as_int);
-                let new_file_name = get_new_file_name(pathstring, &new_lead);
+            //     let new_lead = generate_new_lead(lead_as_int);
+            //     let new_file_name = get_new_file_name(pathstring, &new_lead);
 
-                rename_file(&pathstring, &new_file_name);
-            });
+            //     rename_file(&pathstring, &new_file_name);
+            // });
 
-            create_new_file(&new_scene_path);
+            // create_new_file(&new_scene_path);
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
