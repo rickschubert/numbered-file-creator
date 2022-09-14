@@ -85,14 +85,7 @@ fn main() {
                 println!("That's the new file name {}", &new_file_name);
 
                 // Rename file
-                let result_of_renaming = fs::rename(&pathstring, &new_file_name);
-                match result_of_renaming {
-                    Ok(_) => println!(
-                        "It worked! Renamed from from {} to {}",
-                        &pathstring, new_file_name
-                    ),
-                    Err(error) => panic!("Unable to rename file: {}", error),
-                }
+                rename_file(&pathstring, &new_file_name);
 
                 // Create new file with the desired file name
                 let file_creation_result = File::create(&new_scene_path);
@@ -103,5 +96,16 @@ fn main() {
             });
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
+    }
+}
+
+fn rename_file(pathstring: &str, new_file_name: &str) {
+    let result_of_renaming = fs::rename(pathstring, new_file_name);
+    match result_of_renaming {
+        Ok(_) => println!(
+            "It worked! Renamed from from {} to {}",
+            pathstring, new_file_name
+        ),
+        Err(error) => panic!("Unable to rename file: {}", error),
     }
 }
