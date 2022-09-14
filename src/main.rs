@@ -44,11 +44,11 @@ fn leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn content_paths(items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>>) -> Vec<String> {
+fn content_paths(items: Vec<Result<DirEntry, std::io::Error>>) -> Vec<String> {
     let mut names = Vec::new();
 
     let mut paths = Vec::new();
-    items_that_need_renaming.into_iter().for_each(|x| {
+    items.into_iter().for_each(|x| {
         let p = x.unwrap().path();
         paths.push(p);
     });
