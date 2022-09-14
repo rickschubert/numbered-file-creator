@@ -3,12 +3,17 @@ use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
 use std::path::Path;
 use std::process::exit;
+use lazy_static::lazy_static;
 use std::{env};
+
+lazy_static! {
+    static ref NUMBER_ONLY_REGEX_IN_PATH: Regex = Regex::new(r"/?(\d+)_").unwrap();
+    static ref NUMBLER_ONLY_REGEX_IN_FILE_NAME: Regex = Regex::new(r"^(\d+)_").unwrap();
+}
 
 fn get_leading_number_from_file(file_name: &str) -> &str {
     // TODO: It would be nice if this wouldn't have to be calculated every time
-    let number_only_regex = Regex::new(r"/?(\d+)_").unwrap();
-    let number = number_only_regex
+    let number = NUMBER_ONLY_REGEX_IN_PATH
         .captures(file_name)
         .unwrap()
         .get(1)
@@ -24,8 +29,7 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<String> {
             Ok(dir_entry) => {
                 let n = dir_entry.file_name();
 
-                let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
-                let captured = number_only_regex.captures(&n.to_str().unwrap());
+                let captured = NUMBLER_ONLY_REGEX_IN_FILE_NAME.captures(&n.to_str().unwrap());
                 match captured {
                     Some(_) => (),
                     None => return false,
@@ -98,8 +102,7 @@ fn main() {
 }
 
 fn get_new_file_name(pathstring: &str, new_lead: &str) -> String {
-    let number_only_regex = Regex::new(r"/(\d+)_").unwrap();
-    let new_file_name = number_only_regex.replace(pathstring, new_lead).to_string();
+    let new_file_name = NUMBER_ONLY_REGEX_IN_PATH.replace(pathstring, new_lead).to_string();
     return new_file_name;
 }
 
