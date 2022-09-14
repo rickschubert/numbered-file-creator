@@ -1,5 +1,5 @@
-✍️ scene-creator
-===============
+✍️ numbered-file-creator
+=======================
 
 I created this tool for my local writing workflow. I have a directory with a lot of scenes which I number, i.e. 01, 02, 03 etc. This tool helps me achieve that!
 
