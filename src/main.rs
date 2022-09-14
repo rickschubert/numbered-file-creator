@@ -1,10 +1,10 @@
+use lazy_static::lazy_static;
 use regex::Regex;
+use std::env;
 use std::fs::{self, DirEntry};
 use std::fs::{File, ReadDir};
 use std::path::Path;
 use std::process::exit;
-use lazy_static::lazy_static;
-use std::{env};
 
 lazy_static! {
     static ref NUMBER_ONLY_REGEX_IN_PATH: Regex = Regex::new(r"/?(\d+)_").unwrap();
@@ -21,7 +21,9 @@ fn get_leading_number_from_file(file_name: &str) -> &str {
     return number;
 }
 
-fn get_names_from_dir_entry_results_vector(items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>>) -> Vec<String> {
+fn get_paths_from_contents(
+    items_that_need_renaming: Vec<Result<DirEntry, std::io::Error>>,
+) -> Vec<String> {
     let mut names = Vec::new();
 
     let mut paths = Vec::new();
@@ -51,14 +53,13 @@ fn filter_for_files_to_be_renamed(content: ReadDir, number: &str) -> Vec<String>
 
                 let lead = get_leading_number_from_file(n.to_str().unwrap());
                 let lead_i: &i32 = &lead.parse().unwrap();
-                return lead.eq(number)
-                    || lead_i > &number.parse::<i32>().unwrap();
+                return lead.eq(number) || lead_i > &number.parse::<i32>().unwrap();
             }
         })
         .into_iter()
         .collect();
 
-    let mut names = get_names_from_dir_entry_results_vector(to_be_renamed);
+    let mut names = get_paths_from_contents(to_be_renamed);
     alphanumeric_sort::sort_str_slice_rev(&mut names);
     return names;
 }
@@ -113,7 +114,9 @@ fn main() {
 }
 
 fn get_new_file_name(pathstring: &str, new_lead: &str) -> String {
-    return NUMBER_ONLY_REGEX_IN_PATH.replace(pathstring, new_lead).to_string();
+    return NUMBER_ONLY_REGEX_IN_PATH
+        .replace(pathstring, new_lead)
+        .to_string();
 }
 
 fn generate_new_lead(lead_as_int: &i32) -> String {
@@ -129,10 +132,7 @@ fn generate_new_lead(lead_as_int: &i32) -> String {
 fn rename_file(pathstring: &str, new_file_name: &str) {
     let result = fs::rename(pathstring, new_file_name);
     match result {
-        Ok(_) => println!(
-            "Renamed file from from {} to {}",
-            pathstring, new_file_name
-        ),
+        Ok(_) => println!("Renamed file from from {} to {}", pathstring, new_file_name),
         Err(error) => panic!("Unable to rename file: {}", error),
     }
 }
