@@ -72,11 +72,7 @@ fn main() {
                 let lead_as_int: &i32 = &lead.parse().unwrap();
 
                 let new_lead = generate_new_lead(lead_as_int);
-
-                // Construct the new file name
-                let number_only_regex = Regex::new(r"/(\d+)_").unwrap();
-                let new_file_name = number_only_regex.replace(&pathstring, new_lead).to_string();
-                println!("That's the new file name {}", &new_file_name);
+                let new_file_name = get_new_file_name(pathstring, &new_lead);
 
                 rename_file(&pathstring, &new_file_name);
                 create_new_file(&new_scene_path);
@@ -84,6 +80,12 @@ fn main() {
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
+}
+
+fn get_new_file_name(pathstring: &str, new_lead: &str) -> String {
+    let number_only_regex = Regex::new(r"/(\d+)_").unwrap();
+    let new_file_name = number_only_regex.replace(pathstring, new_lead).to_string();
+    return new_file_name;
 }
 
 fn generate_new_lead(lead_as_int: &i32) -> String {
