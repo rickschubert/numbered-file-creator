@@ -68,8 +68,26 @@ fn main() {
     match paths {
         Ok(inner) => {
             let items_to_be_renamed = filter_for_files_to_be_renamed(inner, &number);
-            dbg!(items_to_be_renamed);
+            dbg!(&items_to_be_renamed);
+
             // For each item that needs renaming, increase the number indicator
+            items_to_be_renamed.into_iter().for_each(|filename| {
+                let lead = get_leading_number_from_file(&filename);
+                let lead_as_int: &i32 = &lead.parse().unwrap();
+
+                let mut new_lead = String::new();
+                if lead_as_int < &9 {
+                    new_lead.push('0');
+                }
+                let new_number_as_int = lead_as_int + 1;
+                new_lead = format!("{new_lead}{new_number_as_int}");
+                println!("This is the new lead {}", new_lead);
+                // new_number_as_int.toch
+                // new_lead.push(new_number_as_int);
+                // If the lead is below 9, construct a special one
+
+                // If the lead is 9 or above, add number
+            });
         }
         Err(error) => panic!("Problem reading the directory: {:?}", error),
     }
