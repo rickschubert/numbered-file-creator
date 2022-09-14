@@ -24,6 +24,14 @@ fn filter_for_files_to_be_renamed(inner: ReadDir, number: &str) -> Vec<Result<Di
             Err(_) => false,
             Ok(dir_entry) => {
                 let n = dir_entry.file_name();
+
+                let number_only_regex = Regex::new(r"^(\d+)_").unwrap();
+                let captured = number_only_regex.captures(&n.to_str().unwrap());
+                match captured {
+                    Some(_) => (),
+                    None => return false,
+                }
+
                 let leading_number_from_file = get_leading_number_from_file(n.to_str().unwrap());
                 let leading_number_as_int: &i32 = &leading_number_from_file.parse().unwrap();
                 return leading_number_from_file.eq(number)
