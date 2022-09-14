@@ -106,7 +106,7 @@ fn main() {
 
                 // Create new file with the desired file name
                 let file_creation_result = File::create(&new_scene_path);
-                match result_of_renaming {
+                match file_creation_result {
                     Ok(_) => println!("It worked! Created new file{}", &new_scene_path),
                     Err(error) => panic!("Unable to create new file: {}", error),
                 }
