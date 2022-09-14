@@ -74,12 +74,19 @@ fn filter_dir_entries_for_files_to_rename(dir_entry: &DirEntry, number: &str) ->
 }
 
 fn filter_content_for_files_to_rename(content: ReadDir, number: &str) -> Vec<String> {
-    let mut to_be_renamed: Vec<DirEntry> = content.into_iter()
-    .filter_map(|s| Some(s.unwrap()))
-    .collect();
+    let mut to_be_renamed: Vec<DirEntry> = content
+        .into_iter()
+        .filter_map(|s| {
+            match s {
+                Ok(s) => Some(s),
+                Err(error) => panic!("A problem with the directory content occured: {}", error),
+            }
+        })
+        .collect();
 
-    to_be_renamed = to_be_renamed.into_iter().filter(|x|
-        filter_dir_entries_for_files_to_rename(x, number),)
+    to_be_renamed = to_be_renamed
+        .into_iter()
+        .filter(|x| filter_dir_entries_for_files_to_rename(x, number))
         .into_iter()
         .collect();
 
